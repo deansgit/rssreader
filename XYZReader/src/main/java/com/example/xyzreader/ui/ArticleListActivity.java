@@ -45,6 +45,8 @@ public class ArticleListActivity extends ActionBarActivity implements
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
+        //TODO implement SharedElementCallback
+        //http://stackoverflow.com/questions/27304834/viewpager-fragments-shared-element-transitions
 
         final View toolbarContainerView = findViewById(R.id.toolbar_container);
 
@@ -134,7 +136,7 @@ public class ArticleListActivity extends ActionBarActivity implements
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = getLayoutInflater().inflate(R.layout.list_item_article, parent, false);
+            final View view = getLayoutInflater().inflate(R.layout.list_item_article, parent, false);
             final ViewHolder vh = new ViewHolder(view);
             view.setOnClickListener(new View.OnClickListener() {
                 @Override

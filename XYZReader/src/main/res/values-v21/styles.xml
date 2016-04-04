@@ -24,7 +24,6 @@
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowSharedElementEnterTransition">@transition/curve</item>
-        <item name="android:windowSharedElementExitTransition">@transition/curve</item>
     </style>
 
     <style name="Theme.Saffron.Detail" parent="Theme.Saffron">
@@ -33,6 +32,7 @@
 
     <style name="ArticlePreview">
         <item name="android:elevation">4dp</item>
+        <item name="android:windowContentTransitions">true</item>
     </style>
 
     <style name="ArticleTitle" parent="@style/TextAppearance.AppCompat.Subhead">

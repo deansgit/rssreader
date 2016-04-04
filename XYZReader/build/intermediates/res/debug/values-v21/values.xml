@@ -7,6 +7,7 @@
     <eat-comment/>
     <style name="ArticlePreview">
         <item name="android:elevation">4dp</item>
+        <item name="android:windowContentTransitions">true</item>
     </style>
     <style name="ArticleSubtitle" parent="@style/TextAppearance.AppCompat.Body1">
         <item name="android:paddingBottom">4dp</item>
@@ -288,9 +289,9 @@
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowSharedElementEnterTransition">@transition/curve</item>
-        <item name="android:windowSharedElementExitTransition">@transition/curve</item>
     </style>
     <style name="Theme.Saffron.Detail" parent="Theme.Saffron">
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:fragmentEnterTransition">@transition/curve</item>
     </style>
 </resources>
