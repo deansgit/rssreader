@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.RecyclerView;
@@ -42,7 +43,6 @@ public class ArticleListActivity extends ActionBarActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_list);
-
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
         //TODO implement SharedElementCallback
@@ -142,19 +142,18 @@ public class ArticleListActivity extends ActionBarActivity implements
                 @Override
                 public void onClick(View v) {
                     String transitionName;
+                    Intent intent = new Intent(Intent.ACTION_VIEW,
+                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         transitionName = vh.thumbnailView.getTransitionName();
-                    }else{
+                    } else {
                         transitionName = null;
                     }
-
-                    //TODO make it not return the wrong image wtf
                     ActivityOptionsCompat activityOptions = ActivityOptionsCompat
                             .makeSceneTransitionAnimation(ArticleListActivity.this,
-                                    vh.thumbnailView, transitionName);
-                    Intent intent = new Intent(Intent.ACTION_VIEW,
-                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
+                            new Pair<View, String>(v.findViewById(R.id.thumbnail), transitionName));
+
                     startActivity(intent, activityOptions.toBundle());
                 }
             });
