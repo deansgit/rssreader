@@ -45,7 +45,6 @@
                     style="@style/ArticleTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/anchor"
                     android:text="TEST TITLE" />
 
                 <TextView
@@ -53,7 +52,6 @@
                     style="@style/ArticleSubtitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/article_title"
                     android:text="test subtitle" />
             </LinearLayout>
 

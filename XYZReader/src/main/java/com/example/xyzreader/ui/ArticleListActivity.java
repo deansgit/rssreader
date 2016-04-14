@@ -153,7 +153,6 @@ public class ArticleListActivity extends ActionBarActivity implements
                     ActivityOptionsCompat activityOptions = ActivityOptionsCompat
                             .makeSceneTransitionAnimation(ArticleListActivity.this,
                             new Pair<View, String>(v.findViewById(R.id.thumbnail), transitionName));
-
                     startActivity(intent, activityOptions.toBundle());
                 }
             });
