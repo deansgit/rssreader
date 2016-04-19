@@ -1,14 +1,17 @@
 package com.example.xyzreader.ui;
 
+import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.util.TypedValue;
@@ -21,6 +24,12 @@ import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 
+import java.util.List;
+import java.util.Map;
+
+import static com.example.xyzreader.ui.ArticleListActivity.CURRENT_POSITION;
+import static com.example.xyzreader.ui.ArticleListActivity.STARTING_POSITION;
+
 /**
  * An activity representing a single Article detail screen, letting you swipe between articles.
  */
@@ -28,6 +37,7 @@ public class ArticleDetailActivity extends ActionBarActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = ArticleDetailActivity.class.getSimpleName();
+
     private Cursor mCursor;
     private long mStartId;
 
@@ -40,6 +50,49 @@ public class ArticleDetailActivity extends ActionBarActivity
     private View mUpButtonContainer;
     private View mUpButton;
 
+    static final String SAVED_POSITION = "saved_position";
+    private boolean mIsReturning;
+    private int mStartingPos;
+    private int mCurrentPos;
+    ArticleDetailFragment mArticleDetailFragment;
+
+    private final SharedElementCallback mCallback = new SharedElementCallback() {
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+            super.onMapSharedElements(names, sharedElements);
+            // sets corresponding picture on recyclerview as destination for return transition
+            if (mIsReturning) {
+                mArticleDetailFragment = new ArticleDetailFragment();
+                View sharedElement = mArticleDetailFragment.getPhotoView();
+                if (sharedElement == null){
+                    names.clear();
+                    sharedElements.clear();
+                }else if (mStartingPos != mCurrentPos){
+                    names.clear();
+                    names.add(sharedElement.getTransitionName());
+                    sharedElements.clear();
+                    sharedElements.put(sharedElement.getTransitionName(), sharedElement);
+                }
+            }
+        }
+    };
+
+    @Override
+    public void finishAfterTransition() {
+        super.finishAfterTransition();
+        mIsReturning = true;
+        Intent intent = new Intent();
+        intent.putExtra(STARTING_POSITION, mStartingPos);
+        intent.putExtra(CURRENT_POSITION, mCurrentPos);
+        setResult(RESULT_OK, intent);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SAVED_POSITION, mCurrentPos);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +104,13 @@ public class ArticleDetailActivity extends ActionBarActivity
         }
         setContentView(R.layout.activity_article_detail);
         getLoaderManager().initLoader(0, null, this);
+
+        mStartingPos = getIntent().getIntExtra(STARTING_POSITION, 0);
+        if (savedInstanceState == null){
+            mCurrentPos = mStartingPos;
+        } else {
+            mCurrentPos = savedInstanceState.getInt(SAVED_POSITION);
+        }
 
         mPagerAdapter = new MyPagerAdapter(getFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
@@ -75,6 +135,7 @@ public class ArticleDetailActivity extends ActionBarActivity
                     mCursor.moveToPosition(position);
                 }
                 mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
+                mCurrentPos = position;
                 updateUpButtonPosition();
             }
         });
@@ -118,6 +179,7 @@ public class ArticleDetailActivity extends ActionBarActivity
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         postponeEnterTransition();
+        setEnterSharedElementCallback(mCallback);
         mCursor = cursor;
         mPagerAdapter.notifyDataSetChanged();
 
@@ -164,9 +226,9 @@ public class ArticleDetailActivity extends ActionBarActivity
         @Override
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
             super.setPrimaryItem(container, position, object);
-            ArticleDetailFragment fragment = (ArticleDetailFragment) object;
-            if (fragment != null) {
-                mSelectedItemUpButtonFloor = fragment.getUpButtonFloor();
+            mArticleDetailFragment = (ArticleDetailFragment) object;
+            if (mArticleDetailFragment != null) {
+                mSelectedItemUpButtonFloor = mArticleDetailFragment.getUpButtonFloor();
                 updateUpButtonPosition();
             }
         }
@@ -183,17 +245,17 @@ public class ArticleDetailActivity extends ActionBarActivity
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void scheduleStartPostponedTransition(final View sharedElement) {
         sharedElement.getViewTreeObserver().addOnPreDrawListener(
                 new ViewTreeObserver.OnPreDrawListener() {
                     @Override
                     public boolean onPreDraw() {
                         sharedElement.getViewTreeObserver().removeOnPreDrawListener(this);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            startPostponedEnterTransition();
-                        }
+                        startPostponedEnterTransition();
                         return true;
                     }
                 });
     }
+
 }

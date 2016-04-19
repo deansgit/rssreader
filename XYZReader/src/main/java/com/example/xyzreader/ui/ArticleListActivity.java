@@ -1,5 +1,6 @@
 package com.example.xyzreader.ui;
 
+import android.annotation.TargetApi;
 import android.app.LoaderManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -19,12 +21,16 @@ import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * An activity representing a list of Articles. This activity has different presentations for
@@ -39,10 +45,65 @@ public class ArticleListActivity extends ActionBarActivity implements
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
 
+    static final String STARTING_POSITION = "starting_position";
+    static final String CURRENT_POSITION = "current_position";
+
+    private Bundle mActivityReenterBundle;
+
+    private final SharedElementCallback mCallback = new SharedElementCallback() {
+        @Override
+        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+            super.onMapSharedElements(names, sharedElements);
+            if (mActivityReenterBundle != null) {
+                int startingPosition = mActivityReenterBundle.getInt(STARTING_POSITION);
+                int currentPosition = mActivityReenterBundle.getInt(CURRENT_POSITION);
+                if (startingPosition != currentPosition) {
+                    String newTransitionName = getString(R.string.image_transition_name) + currentPosition;
+                    View newSharedElement = mRecyclerView.findViewWithTag(newTransitionName);
+                    if (newSharedElement != null) {
+                        names.clear();
+                        names.add(newTransitionName);
+                        sharedElements.clear();
+                        sharedElements.put(newTransitionName, newSharedElement);
+                    }
+                }
+                //reset conditional every time
+                mActivityReenterBundle = null;
+            }
+        }
+    };
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        super.onActivityReenter(resultCode, data);
+        mActivityReenterBundle = new Bundle(data.getExtras());
+
+        // make sure view is visible before starting transition
+        int startingPosition = mActivityReenterBundle.getInt(STARTING_POSITION);
+        int currentPosition = mActivityReenterBundle.getInt(CURRENT_POSITION);
+        if (startingPosition != currentPosition) {
+            mRecyclerView.scrollToPosition(currentPosition);
+        }
+        postponeEnterTransition();
+        mRecyclerView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                mRecyclerView.getViewTreeObserver().removeOnPreDrawListener(this);
+                mRecyclerView.requestLayout();
+                startPostponedEnterTransition();
+                return true;
+            }
+        });
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_list);
+        setExitSharedElementCallback(mCallback);
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
         //TODO implement SharedElementCallback
@@ -128,6 +189,7 @@ public class ArticleListActivity extends ActionBarActivity implements
             mCursor = cursor;
         }
 
+
         @Override
         public long getItemId(int position) {
             mCursor.moveToPosition(position);
@@ -144,6 +206,7 @@ public class ArticleListActivity extends ActionBarActivity implements
                     String transitionName;
                     Intent intent = new Intent(Intent.ACTION_VIEW,
                             ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
+                    intent.putExtra(STARTING_POSITION, mCursor.getLong(ArticleLoader.Query._ID));
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         transitionName = vh.thumbnailView.getTransitionName();
@@ -152,7 +215,7 @@ public class ArticleListActivity extends ActionBarActivity implements
                     }
                     ActivityOptionsCompat activityOptions = ActivityOptionsCompat
                             .makeSceneTransitionAnimation(ArticleListActivity.this,
-                            new Pair<View, String>(v.findViewById(R.id.thumbnail), transitionName));
+                                    new Pair<View, String>(v.findViewById(R.id.thumbnail), transitionName));
                     startActivity(intent, activityOptions.toBundle());
                 }
             });
@@ -176,8 +239,9 @@ public class ArticleListActivity extends ActionBarActivity implements
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
             // dynamically set a unique transitionName per image using the itemID.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                holder.thumbnailView.setTransitionName(getString(R.string.image_transition_name)
-                        + mCursor.getLong(ArticleLoader.Query._ID));
+                String transitionName = getString(R.string.image_transition_name) + getItemId(position);
+                holder.thumbnailView.setTransitionName(transitionName);
+                holder.thumbnailView.setTag(transitionName);
             }
         }
 

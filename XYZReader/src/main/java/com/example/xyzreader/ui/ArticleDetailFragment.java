@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.graphics.Palette;
 import android.text.Html;
@@ -161,6 +162,7 @@ public class ArticleDetailFragment extends Fragment implements
                     (int) (Color.red(mMutedColor) * 0.9),
                     (int) (Color.green(mMutedColor) * 0.9),
                     (int) (Color.blue(mMutedColor) * 0.9));
+//            getActivityCast().scheduleStartPostponedTransition(mPhotoView);
         }
         mStatusBarColorDrawable.setColor(color);
         mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
@@ -239,8 +241,6 @@ public class ArticleDetailFragment extends Fragment implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        ArticleDetailActivity activity = new ArticleDetailActivity();
-
         if (!isAdded()) {
             if (cursor != null) {
                 cursor.close();
@@ -255,7 +255,6 @@ public class ArticleDetailFragment extends Fragment implements
             mCursor = null;
         }
         bindViews();
-        activity.scheduleStartPostponedTransition(mPhotoView);
     }
 
     @Override
@@ -274,4 +273,10 @@ public class ArticleDetailFragment extends Fragment implements
                 ? (int) mPhotoContainerView.getTranslationY() + mPhotoView.getHeight() - mScrollY
                 : mPhotoView.getHeight() - mScrollY;
     }
+
+    @Nullable
+    ImageView getPhotoView(){
+        return mPhotoView;
+    }
+
 }
