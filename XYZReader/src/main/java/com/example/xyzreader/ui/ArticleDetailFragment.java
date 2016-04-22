@@ -62,7 +62,8 @@ public class ArticleDetailFragment extends Fragment implements
      */
     public ArticleDetailFragment() {
     }
-
+    
+    // TODO: 4/18/2016 possibly add in param for position 
     public static ArticleDetailFragment newInstance(long itemId) {
         Bundle arguments = new Bundle();
         arguments.putLong(ARG_ITEM_ID, itemId);
@@ -125,7 +126,6 @@ public class ArticleDetailFragment extends Fragment implements
 
         mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
         mPhotoView.setTransitionName(getString(R.string.image_transition_name) + mItemId);
-        // append mItemId to make transitionName unique for photo
         mPhotoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,7 +162,6 @@ public class ArticleDetailFragment extends Fragment implements
                     (int) (Color.red(mMutedColor) * 0.9),
                     (int) (Color.green(mMutedColor) * 0.9),
                     (int) (Color.blue(mMutedColor) * 0.9));
-//            getActivityCast().scheduleStartPostponedTransition(mPhotoView);
         }
         mStatusBarColorDrawable.setColor(color);
         mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
@@ -218,6 +217,7 @@ public class ArticleDetailFragment extends Fragment implements
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
                                 updateStatusBar();
+                                getActivityCast().scheduleStartPostponedTransition(mPhotoView);
                             }
                         }
 

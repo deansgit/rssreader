@@ -51,6 +51,7 @@ public class ArticleDetailActivity extends ActionBarActivity
     private View mUpButton;
 
     static final String SAVED_POSITION = "saved_position";
+    static final String SELECTED_ID = "selected_id";
     private boolean mIsReturning;
     private int mStartingPos;
     private int mCurrentPos;
@@ -85,6 +86,7 @@ public class ArticleDetailActivity extends ActionBarActivity
         Intent intent = new Intent();
         intent.putExtra(STARTING_POSITION, mStartingPos);
         intent.putExtra(CURRENT_POSITION, mCurrentPos);
+        intent.putExtra(SELECTED_ID, mSelectedItemId);
         setResult(RESULT_OK, intent);
     }
 
@@ -92,6 +94,7 @@ public class ArticleDetailActivity extends ActionBarActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(SAVED_POSITION, mCurrentPos);
+
     }
 
     @Override
@@ -104,6 +107,8 @@ public class ArticleDetailActivity extends ActionBarActivity
         }
         setContentView(R.layout.activity_article_detail);
         getLoaderManager().initLoader(0, null, this);
+        setEnterSharedElementCallback(mCallback);
+        postponeEnterTransition();
 
         mStartingPos = getIntent().getIntExtra(STARTING_POSITION, 0);
         if (savedInstanceState == null){
@@ -178,8 +183,6 @@ public class ArticleDetailActivity extends ActionBarActivity
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        postponeEnterTransition();
-        setEnterSharedElementCallback(mCallback);
         mCursor = cursor;
         mPagerAdapter.notifyDataSetChanged();
 

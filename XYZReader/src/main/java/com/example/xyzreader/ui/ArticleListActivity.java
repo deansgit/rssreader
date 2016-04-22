@@ -13,12 +13,13 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.util.Pair;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout;`
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -47,8 +48,10 @@ public class ArticleListActivity extends ActionBarActivity implements
 
     static final String STARTING_POSITION = "starting_position";
     static final String CURRENT_POSITION = "current_position";
+    static final String SELECTED_ID = "selected_id";
 
     private Bundle mActivityReenterBundle;
+    private boolean mIsArtDetActStarted;
 
     private final SharedElementCallback mCallback = new SharedElementCallback() {
         @Override
@@ -57,8 +60,10 @@ public class ArticleListActivity extends ActionBarActivity implements
             if (mActivityReenterBundle != null) {
                 int startingPosition = mActivityReenterBundle.getInt(STARTING_POSITION);
                 int currentPosition = mActivityReenterBundle.getInt(CURRENT_POSITION);
+                long selectedId = mActivityReenterBundle.getLong(SELECTED_ID);
                 if (startingPosition != currentPosition) {
-                    String newTransitionName = getString(R.string.image_transition_name) + currentPosition;
+                    String newTransitionName = getString(R.string.image_transition_name) + selectedId;
+                    Log.v("REENTER", "newTransitionName is: " + newTransitionName);
                     View newSharedElement = mRecyclerView.findViewWithTag(newTransitionName);
                     if (newSharedElement != null) {
                         names.clear();
@@ -77,6 +82,7 @@ public class ArticleListActivity extends ActionBarActivity implements
     @Override
     public void onActivityReenter(int resultCode, Intent data) {
         super.onActivityReenter(resultCode, data);
+        Log.v("REENTER", "onActivityReenter called");
         mActivityReenterBundle = new Bundle(data.getExtras());
 
         // make sure view is visible before starting transition
@@ -95,7 +101,12 @@ public class ArticleListActivity extends ActionBarActivity implements
                 return true;
             }
         });
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mIsArtDetActStarted = false;
     }
 
     @Override
@@ -206,7 +217,7 @@ public class ArticleListActivity extends ActionBarActivity implements
                     String transitionName;
                     Intent intent = new Intent(Intent.ACTION_VIEW,
                             ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
-                    intent.putExtra(STARTING_POSITION, mCursor.getLong(ArticleLoader.Query._ID));
+                    intent.putExtra(STARTING_POSITION, vh.getAdapterPosition());
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         transitionName = vh.thumbnailView.getTransitionName();
@@ -216,7 +227,9 @@ public class ArticleListActivity extends ActionBarActivity implements
                     ActivityOptionsCompat activityOptions = ActivityOptionsCompat
                             .makeSceneTransitionAnimation(ArticleListActivity.this,
                                     new Pair<View, String>(v.findViewById(R.id.thumbnail), transitionName));
-                    startActivity(intent, activityOptions.toBundle());
+                    if (!mIsArtDetActStarted) {
+                        startActivity(intent, activityOptions.toBundle());
+                    }
                 }
             });
             return vh;
