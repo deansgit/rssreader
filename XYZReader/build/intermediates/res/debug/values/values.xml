@@ -258,6 +258,7 @@
     <!-- From: file:/C:/Users/SandD/Documents/AndroidStudioProjects/xyzreader/XYZReader/src/main/res/values/dimens.xml -->
     <eat-comment/>
     <dimen name="action_bar_vertical_space">60dp</dimen>
+    <dimen name="background_protection">112dp</dimen>
     <!-- From: file:/C:/Users/SandD/Documents/AndroidStudioProjects/xyzreader/XYZReader/build/intermediates/exploded-aar/com.android.support/cardview-v7/23.2.1/res/values/values.xml -->
     <eat-comment/>
     <dimen name="cardview_compat_inset_shadow">1dp</dimen>
@@ -326,6 +327,9 @@
     <item format="float" name="highlight_alpha_material_colored" type="dimen">0.26</item>
     <item format="float" name="highlight_alpha_material_dark" type="dimen">0.20</item>
     <item format="float" name="highlight_alpha_material_light" type="dimen">0.12</item>
+    <!-- From: file:/C:/Users/SandD/Documents/AndroidStudioProjects/xyzreader/XYZReader/src/main/res/values/dimens.xml -->
+    <eat-comment/>
+    <dimen name="init_scroll_up_distance">@dimen/background_protection</dimen>
     <!-- From: file:/C:/Users/SandD/Documents/AndroidStudioProjects/xyzreader/XYZReader/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/23.2.1/res/values/values.xml -->
     <eat-comment/>
     <dimen name="item_touch_helper_max_drag_scroll_per_frame">20dp</dimen>
@@ -333,6 +337,7 @@
     <dimen name="item_touch_helper_swipe_escape_velocity">120dp</dimen>
     <!-- From: file:/C:/Users/SandD/Documents/AndroidStudioProjects/xyzreader/XYZReader/src/main/res/values/dimens.xml -->
     <eat-comment/>
+    <dimen name="left_keyline">4dp</dimen>
     <dimen name="list_item_article_subtitle">12sp</dimen>
     <dimen name="list_item_article_title">16sp</dimen>
     <dimen name="list_item_thumbnail">@dimen/match_parent</dimen>
@@ -348,6 +353,11 @@
     <dimen name="notification_large_icon_height">64dp</dimen>
     <dimen name="notification_large_icon_width">64dp</dimen>
     <dimen name="notification_subtext_size">12dp</dimen>
+    <!-- From: file:/C:/Users/SandD/Documents/AndroidStudioProjects/xyzreader/XYZReader/src/main/res/values/dimens.xml -->
+    <eat-comment/>
+    <dimen name="right_keyline">@dimen/left_keyline</dimen>
+    <!-- From: file:/C:/Users/SandD/Documents/AndroidStudioProjects/xyzreader/XYZReader/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.2.1/res/values/values.xml -->
+    <eat-comment/>
     <drawable name="notification_template_icon_bg">#3333B5E5</drawable>
     <!-- From: file:/C:/Users/SandD/Documents/AndroidStudioProjects/xyzreader/XYZReader/src/main/res/values/dimens.xml -->
     <eat-comment/>

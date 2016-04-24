@@ -79,6 +79,15 @@ public class ArticleDetailActivity extends ActionBarActivity
         }
     };
 
+    // TODO: 4/23/2016 add animation to bring text into view. instructive motion  
+//    @Override
+//    public void onEnterAnimationComplete() {
+//        super.onEnterAnimationComplete();
+//        final int startScrollPos = getResources()
+//                .getDimensionPixelSize(R.dimen.init_scroll_up_distance);
+//        Animator animator = ObjectAnimator.ofInt()
+//    }
+
     @Override
     public void finishAfterTransition() {
         super.finishAfterTransition();

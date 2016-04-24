@@ -25,12 +25,12 @@
                     android:id="@+id/photo"
                     android:layout_width="@dimen/match_parent"
                     android:layout_height="wrap_content"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                      />
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="112dp"
+                    android:layout_height="@dimen/background_protection"
                     android:background="@drawable/photo_background_protection" />
 
             </FrameLayout>

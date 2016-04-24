@@ -129,8 +129,7 @@ public class ArticleDetailFragment extends Fragment implements
         mPhotoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.v(TAG, "position is " + mPhotoView.getTransitionName());
-                Log.v(TAG, "Activity Name is" + getActivity().getClass().getSimpleName());
+                Log.v(ArticleListActivity.LOG_TAG_POSITION, "CLICKED: position is " + mPhotoView.getTransitionName());
             }
         });
 

@@ -8,11 +8,18 @@
     <dimen name="fab_press_translation_z">6dp</dimen>
     <dimen name="fab_margin">24dp</dimen>
 
+    <dimen name="init_scroll_up_distance">@dimen/background_protection</dimen>
+    <dimen name="background_protection">112dp</dimen>
+
     <!-- list-->
     <item name="match_parent" format="integer" type="dimen">-1</item><!-- for readability-->
     <dimen name="list_item_thumbnail">@dimen/match_parent</dimen>
     <dimen name="list_item_article_title">16sp</dimen>
     <dimen name="list_item_article_subtitle">12sp</dimen>
     <dimen name="action_bar_vertical_space">60dp</dimen>
+
+    <!-- general-->
+    <dimen name="left_keyline">4dp</dimen>
+    <dimen name="right_keyline">@dimen/left_keyline</dimen>
 
 </resources>

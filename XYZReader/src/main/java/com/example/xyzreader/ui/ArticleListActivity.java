@@ -13,16 +13,20 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.util.Pair;
-import android.support.v4.widget.SwipeRefreshLayout;`
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
+import android.transition.Scene;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.example.xyzreader.R;
@@ -42,13 +46,18 @@ import java.util.Map;
 public class ArticleListActivity extends ActionBarActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private Toolbar mToolbar;
+    static final String LOG_TAG_POSITION = "POSITION_TRACKER";
+
+//    private Toolbar mToolbar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
 
     static final String STARTING_POSITION = "starting_position";
     static final String CURRENT_POSITION = "current_position";
     static final String SELECTED_ID = "selected_id";
+
+    ViewGroup mSceneRoot;
+    Scene mRecylerViewScene;
 
     private Bundle mActivityReenterBundle;
     private boolean mIsArtDetActStarted;
@@ -78,6 +87,7 @@ public class ArticleListActivity extends ActionBarActivity implements
         }
     };
 
+    // TODO: 4/23/2016 this doesn't get called....
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onActivityReenter(int resultCode, Intent data) {
@@ -115,12 +125,11 @@ public class ArticleListActivity extends ActionBarActivity implements
         setContentView(R.layout.activity_article_list);
         setExitSharedElementCallback(mCallback);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
-
-        //TODO implement SharedElementCallback
-        //http://stackoverflow.com/questions/27304834/viewpager-fragments-shared-element-transitions
-
-        final View toolbarContainerView = findViewById(R.id.toolbar_container);
+//        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+//        final View toolbarContainerView = findViewById(R.id.toolbar_container);
+//
+//        mSceneRoot = (ViewGroup) findViewById(R.id.swipe_refresh_layout);
+//        mRecylerViewScene = new Scene(mSceneRoot);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -132,6 +141,12 @@ public class ArticleListActivity extends ActionBarActivity implements
         });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        RecyclerView.ItemAnimator itemAnimator = mRecyclerView.getItemAnimator();   
+        //// TODO: 4/24/2016 figure out the merits of using SimpleItemAnimator over DefaultItemAnimator
+        if (itemAnimator instanceof SimpleItemAnimator) {
+            Log.v("ITEMANIMATOR", "it is simple");
+            ((SimpleItemAnimator) itemAnimator).setSupportsChangeAnimations(false);
+        }
         getLoaderManager().initLoader(0, null, this);
 
         if (savedInstanceState == null) {
@@ -179,7 +194,7 @@ public class ArticleListActivity extends ActionBarActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        Adapter adapter = new Adapter(cursor);
+        Adapter adapter = new Adapter(cursor, getApplicationContext());
         adapter.setHasStableIds(true);
         mRecyclerView.setAdapter(adapter);
         int columnCount = getResources().getInteger(R.integer.list_column_count);
@@ -195,9 +210,12 @@ public class ArticleListActivity extends ActionBarActivity implements
 
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
         private Cursor mCursor;
+        private Context context;
+        private int lastPosition = -1;
 
-        public Adapter(Cursor cursor) {
+        public Adapter(Cursor cursor, Context context) {
             mCursor = cursor;
+            this.context = context;
         }
 
 
@@ -256,21 +274,33 @@ public class ArticleListActivity extends ActionBarActivity implements
                 holder.thumbnailView.setTransitionName(transitionName);
                 holder.thumbnailView.setTag(transitionName);
             }
+            setAnimation(holder.itemView, position);
         }
 
         @Override
         public int getItemCount() {
             return mCursor.getCount();
         }
+
+        private void setAnimation(View view, int position){
+            if (position > lastPosition) {
+                Animation animation = AnimationUtils
+                        .loadAnimation(getApplication(), R.anim.slide_in_bottom);
+                view.startAnimation(animation);
+                lastPosition = position;
+            }
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        public CardView cardView;
         public DynamicHeightNetworkImageView thumbnailView;
         public TextView titleView;
         public TextView subtitleView;
 
         public ViewHolder(View view) {
             super(view);
+            cardView = (CardView) view.findViewById(R.id.article_list_item_container);
             thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
             titleView = (TextView) view.findViewById(R.id.article_title);
             subtitleView = (TextView) view.findViewById(R.id.article_subtitle);

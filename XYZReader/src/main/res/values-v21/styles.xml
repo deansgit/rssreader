@@ -38,10 +38,10 @@
     <style name="ArticleTitle" parent="@style/TextAppearance.AppCompat.Subhead">
         <item name="android:paddingTop">4dp</item>
         <item name="android:paddingBottom">2dp</item>
-        <item name="android:paddingLeft">4dp</item>
-        <item name="android:paddingRight">4dp</item>
-        <item name="android:paddingStart">4dp</item>
-        <item name="android:paddingEnd">4dp</item>
+        <item name="android:paddingLeft">@dimen/left_keyline</item>
+        <item name="android:paddingRight">@dimen/right_keyline</item>
+        <item name="android:paddingStart">@dimen/left_keyline</item>
+        <item name="android:paddingEnd">@dimen/right_keyline</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">4</item>
         <item name="android:textColor">@color/article_title</item>
@@ -53,10 +53,10 @@
 
     <style name="ArticleSubtitle" parent="@style/TextAppearance.AppCompat.Body1">
         <item name="android:paddingBottom">4dp</item>
-        <item name="android:paddingLeft">4dp</item>
-        <item name="android:paddingRight">4dp</item>
-        <item name="android:paddingStart">4dp</item>
-        <item name="android:paddingEnd">4dp</item>
+        <item name="android:paddingLeft">@dimen/left_keyline</item>
+        <item name="android:paddingRight">@dimen/right_keyline</item>
+        <item name="android:paddingStart">@dimen/left_keyline</item>
+        <item name="android:paddingEnd">@dimen/right_keyline</item>
         <item name="android:textColor">@color/article_subtitle</item>
         <item name="android:textSize">8sp</item>
         <item name="android:maxLines">1</item>
