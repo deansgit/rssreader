@@ -87,12 +87,14 @@ public class ArticleListActivity extends ActionBarActivity implements
         }
     };
 
+
+
     // TODO: 4/23/2016 this doesn't get called....
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onActivityReenter(int resultCode, Intent data) {
         super.onActivityReenter(resultCode, data);
-        Log.v("REENTER", "onActivityReenter called");
+        Log.v("RESUME", "onActivityReenter called");
         mActivityReenterBundle = new Bundle(data.getExtras());
 
         // make sure view is visible before starting transition
@@ -115,6 +117,7 @@ public class ArticleListActivity extends ActionBarActivity implements
 
     @Override
     protected void onResume() {
+        Log.v("RESUME", "onRESUME called");
         super.onResume();
         mIsArtDetActStarted = false;
     }
@@ -144,7 +147,6 @@ public class ArticleListActivity extends ActionBarActivity implements
         RecyclerView.ItemAnimator itemAnimator = mRecyclerView.getItemAnimator();   
         //// TODO: 4/24/2016 figure out the merits of using SimpleItemAnimator over DefaultItemAnimator
         if (itemAnimator instanceof SimpleItemAnimator) {
-            Log.v("ITEMANIMATOR", "it is simple");
             ((SimpleItemAnimator) itemAnimator).setSupportsChangeAnimations(false);
         }
         getLoaderManager().initLoader(0, null, this);
@@ -272,7 +274,6 @@ public class ArticleListActivity extends ActionBarActivity implements
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 String transitionName = getString(R.string.image_transition_name) + getItemId(position);
                 holder.thumbnailView.setTransitionName(transitionName);
-                holder.thumbnailView.setTag(transitionName);
             }
             setAnimation(holder.itemView, position);
         }
@@ -286,6 +287,8 @@ public class ArticleListActivity extends ActionBarActivity implements
             if (position > lastPosition) {
                 Animation animation = AnimationUtils
                         .loadAnimation(getApplication(), R.anim.slide_in_bottom);
+                animation.setDuration(500);
+                animation.setStartTime(400);
                 view.startAnimation(animation);
                 lastPosition = position;
             }

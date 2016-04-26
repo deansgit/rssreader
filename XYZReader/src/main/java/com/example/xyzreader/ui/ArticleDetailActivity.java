@@ -185,6 +185,14 @@ public class ArticleDetailActivity extends ActionBarActivity
         }
     }
 
+    //edited to change blinky default up-button transition
+    @Override
+    public boolean onSupportNavigateUp() {
+        this.finish();
+        overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in);
+        return super.onSupportNavigateUp();
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return ArticleLoader.newAllArticlesInstance(this);
